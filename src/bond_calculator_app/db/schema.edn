@@ -1,0 +1,94 @@
+(ns db.schema
+  (:require [datomic.api :as d]))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+
+(def  uri "datomic:free://localhost:4334/bondCalculations")
+
+(d/create-database uri)
+
+(def conn (d/connect uri))
+
+(def db (d/db conn))
+
+(def schema
+  [{:db/id #db/id[:db.part/db]
+    :db/ident :user/user-fullname
+    :db/valueType :db.type/string
+    :db/cardinality :db.cardinality/one
+    :db/doc "The user's name"
+    :db.install/_attribute :db.part/db}
+
+   {:db/id #db/id[:db.part/db]
+    :db/ident :user/email
+    :db/valueType :db.type/string
+    :db/index true
+    :db/cardinality :db.cardinality/one
+    :db/doc "The user's email address"
+    :db.install/_attribute :db.part/db}
+
+   {:db/id #db/id[:db.part/db]
+    :db/ident :user/calculation
+    :db/valueType :db.type/ref
+    :db/cardinality :db.cardinality/one
+    :db/doc "User reference to calculations"
+    :db.install/_attribute :db.part/db}
+
+   {:db/id #db/id[:db.part/db]
+    :db/ident :calculation/purchase-price
+    :db/valueType :db.type/double
+    :db/cardinality :db.cardinality/one
+    :db/doc "The property purchase price"
+    :db.install/_attribute :db.part/db}
+
+   {:db/id #db/id[:db.part/db]
+    :db/ident :calculation/deposit
+    :db/valueType :db.type/double
+    :db/cardinality :db.cardinality/one
+    :db/doc "The deposit paid"
+    :db.install/_attribute :db.part/db}
+
+   {:db/id #db/id[:db.part/db]
+    :db/ident :calculation/term
+    :db/valueType :db.type/double
+    :db/cardinality :db.cardinality/one
+    :db/doc "The payment term in years"
+    :db.install/_attribute :db.part/db}
+
+   {:db/id #db/id[:db.part/db]
+    :db/ident :calculation/interest-rate
+    :db/valueType :db.type/double
+    :db/cardinality :db.cardinality/one
+    :db/doc "The fixed interest rate"
+    :db.install/_attribute :db.part/db}
+
+    {:db/id #db/id[:db.part/db]
+    :db/ident :calculation/interest-rate
+    :db/valueType :db.type/double
+    :db/cardinality :db.cardinality/one
+    :db/doc "The fixed interest rate"
+    :db.install/_attribute :db.part/db}])
+
+(d/transact conn schema)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; ADD Calculations Partition
+(def add-calculations-partition
+  [{:db/id #db/id[:db.part/db -1]
+    :db/ident :calculations}
+   [:db/add :db.part/db :db.install/partition #db/id[:db.part/db -1]]])
+
+(d/transact conn add-calculations-partition)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Testing
+(let [test-data {:db/id (d/tempid :calculations)
+                 :user/user-fullname "John Doe"
+                 :user/email "john@doe.com"
+                 :calculation/purchase-price 200000.0
+                 :calculation/deposit 5000.0
+                 :calculation/term 5.0
+                 :calculation/interest-rate 5.0}]
+  (println test-data)
+  (d/transact conn [test-data]))

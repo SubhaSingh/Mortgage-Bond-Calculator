@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+ <meta charset = "UTF-8">
+<head>
+	<title>Fixed Interest Rate Bond Calculator</title>
+	
+	<script src="https://www.w3schools.com/lib/w3.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+
+<!------------------------------------------------------------------------------------------------------------- -->
+
+<body onload="displaySaveForm()">
+
+<center>	
+<h1>Fixed Interest Rate Bond Calculator</h1>
+<br><br>
+<!------------------------------------------------------------------------------------------------------------- -->
+	<form action="javascript:void(0);" >
+	 Purchase Price:<br>
+	  <input type="number" name="purchase-price" id="purchase_price" min="0" required>
+	  <br>
+	  Deposit:<br>
+	  <input type="number" name="deposit" id="deposit" min="0" required>
+	  <br>
+	  Bond Term (years):<br>
+	  <input type="number" name="term"  id="term" min="0" required>
+	  <br>
+	  Fixed Interest Rate:<br>
+	  <input type="number" name="interest-rate" id="interest_rate" min="0" required>
+	  <br><br>
+	  <input type="submit" name="calculateButton" value="Calculate" onclick="monthlyRepayment()"> 
+	  <input type="submit" name="resetButton" value="Reset" onclick="resetForm()">
+	</form> 
+	<br><br>
+
+	<p id="repaymentResult"></p>
+
+<!------------------------------------------------------------------------------------------------------------- -->
+	<form id="saveForm" action="javascript:void(0);" method="POST">
+		Full Name:<br>
+	  <input type="text" name="fullname"  id="fullname" required>
+	  <br>
+	  Email:<br>
+	  <input type="email" name="email" id="email" pattern="^[\w]{1,}[\w.+-]{0,}@[\w-]{2,}([.][a-zA-Z]{2,}|[.][\w-]{2,}[.][a-zA-Z]{2,})$" required>
+	  <br><br>
+	  <input type="submit" id="button" value="Save Calculation">
+
+	</form>
+
+</center>
+
+<!------------------------------------------------------------------------------------------------------------- -->
+
+<script>
+var purchase_price = 0;
+var deposit = 0;
+var term = 0;
+var interest_rate = 0;
+var bond_amount= 0;
+var monthly_repayment = 0;
+var show = false;
+
+function monthlyRepayment(){
+	purchase_price = document.getElementById("purchase_price").value;
+	deposit = document.getElementById("deposit").value;
+	term = document.getElementById("term").value;
+	interest_rate = document.getElementById("interest_rate").value;
+	decimal_interest_rate = (((document.getElementById("interest_rate").value)/12)/100);	
+	bond_amount = (purchase_price - deposit);
+
+	monthly_repayment = ((decimal_interest_rate* bond_amount)/(1- Math.pow((1+decimal_interest_rate), (term*-12)))).toFixed(2);
+	displayRepaymentResult();
+}
+
+function displayRepaymentResult(){
+	document.getElementById("repaymentResult").innerHTML = 
+	"Calculator Inputs: <br>" +
+	"Purchase Price = R" + purchase_price + "<br>" +
+	"Deposit = R" + deposit + "<br>" +
+	"Bond Term = " + term + " years" + "<br>" +
+	"Fixed Interest Rate = " + interest_rate + '%' + " <br><br>" +
+	"Monthly Repayment = R" + monthly_repayment + "<br>";
+	show = true;
+	displaySaveForm();
+}
+
+function resetForm(){
+	purchase_price = 0;
+  	deposit = 0;
+	term = 0;
+ 	interest_rate = 0;
+ 	bond_amount= 0;
+ 	monthly_repayment = 0;
+	show = false;
+	location.reload();
+}
+
+function displaySaveForm(){
+	if(show){
+		document.getElementById("saveForm").style.display = "block";
+	}else{
+		document.getElementById("saveForm").style.display = "none";
+	}
+}
+
+//-------------------------------------------------------------------------------------------------------
+//JQuery
+$(document).ready(function (){
+	$("#button").click(function(){
+    var x = $("#saveForm");
+    var form_data = getFormData(x);
+    $.ajax({
+         url: "/save-calculation",
+         data: form_data,
+         type: "POST",
+         beforeSend: function(xhr){xhr.setRequestHeader('X-Test-Header', 'test-value');},
+         success: function(result) { alert('Save calculation request successful') }
+      });
+	});
+});
+
+</script>
+
+
+</body>
+
+</html>
