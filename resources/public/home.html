@@ -6,6 +6,10 @@
 	
 	<script src="https://www.w3schools.com/lib/w3.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+ 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+ 	<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
 </head>
 
 <!------------------------------------------------------------------------------------------------------------- -->
@@ -38,6 +42,7 @@
 
 <!------------------------------------------------------------------------------------------------------------- -->
 	<form id="saveForm" action="javascript:void(0);" method="POST">
+		Please fill out this form to save the calculation or press reset to perform another calculation.<br>
 		Full Name:<br>
 	  <input type="text" name="fullname"  id="fullname" required>
 	  <br>
@@ -45,8 +50,17 @@
 	  <input type="email" name="email" id="email" pattern="^[\w]{1,}[\w.+-]{0,}@[\w-]{2,}([.][a-zA-Z]{2,}|[.][\w-]{2,}[.][a-zA-Z]{2,})$" required>
 	  <br><br>
 	  <input type="submit" id="button" value="Save Calculation">
+	  <input type="submit" name="resetButton" value="Reset" onclick="resetForm()">
 
 	</form>
+
+	<br><br>
+
+	<div id="dvTable"></div>	
+
+	<br><br>
+
+	<div id="stacked" style="height: 250px;"></div>
 
 </center>
 
@@ -59,16 +73,17 @@ var term = 0;
 var interest_rate = 0;
 var bond_amount= 0;
 var monthly_repayment = 0;
+var decimal_interest_rate = 0;	
 var show = false;
+var yearlyPercentages = new Array();
 
 function monthlyRepayment(){
 	purchase_price = document.getElementById("purchase_price").value;
 	deposit = document.getElementById("deposit").value;
 	term = document.getElementById("term").value;
 	interest_rate = document.getElementById("interest_rate").value;
-	decimal_interest_rate = (((document.getElementById("interest_rate").value)/12)/100);	
+	decimal_interest_rate = ((interest_rate/12)/100);
 	bond_amount = (purchase_price - deposit);
-
 	monthly_repayment = ((decimal_interest_rate* bond_amount)/(1- Math.pow((1+decimal_interest_rate), (term*-12)))).toFixed(2);
 	displayRepaymentResult();
 }
@@ -83,7 +98,86 @@ function displayRepaymentResult(){
 	"Monthly Repayment = R" + monthly_repayment + "<br>";
 	show = true;
 	displaySaveForm();
+	createCumulativeInterestTable(term);
+	createBarChart(term);
 }
+//--------------------------------------------------------------------------------------------------------------------
+function createCumulativeInterestTable(term){
+	yearlyPercentages.push(["Year", "Interest (%)", "Capital (%)"]);
+	for(i = 0; i < term; i++){
+		var months = (i+1) * 12;
+		var base_total = (bond_amount/(term*12))*months;
+		var repayment_total = monthly_repayment*months;
+		var cumulative_interest = (((bond_amount*decimal_interest_rate) - monthly_repayment)*((Math.pow((1+decimal_interest_rate), months)-1)/decimal_interest_rate)) + (monthly_repayment*months);
+		var interest_percentage = ((cumulative_interest/repayment_total)*100).toFixed(2);
+		var capital_percentage = (100 - interest_percentage).toFixed(2);
+		yearlyPercentages.push([i+1, interest_percentage, capital_percentage]);
+	}
+
+	//Create a HTML Table element.
+    var table = document.createElement("TABLE");
+    table.border = "1";
+ 
+    //Get the count of columns.
+    var columnCount = yearlyPercentages[0].length;
+ 
+    //Add the header row.
+    var row = table.insertRow(-1);
+    for (var i = 0; i < columnCount; i++) {
+        var headerCell = document.createElement("TH");
+        headerCell.innerHTML = yearlyPercentages[0][i];
+        row.appendChild(headerCell);
+    }
+ 
+    //Add the data rows.
+    for (var i = 1; i < yearlyPercentages.length; i++) {
+        row = table.insertRow(-1);
+        for (var j = 0; j < columnCount; j++) {
+            var cell = row.insertCell(-1);
+            cell.innerHTML = yearlyPercentages[i][j];
+        }
+    }
+ 
+    var dvTable = document.getElementById("dvTable");
+    dvTable.innerHTML = "<h2>Percentage of Yearly Repayments towards Capital and Interest (Cumulative)</h2>";
+    dvTable.appendChild(table)
+	
+}
+//--------------------------------------------------------------------------------------------------------------------
+function createBarChart(term){
+	var data = [];
+
+	for(i = 0; i < term; i++){
+		data.push({y: (i+1), a: yearlyPercentages[i+1][2], b: yearlyPercentages[i+1][1]});
+	}
+
+    formatY = function (y) {
+            return '%'+y;
+        },
+    formatX = function (x) {
+            return x.src.y;
+        },
+    
+    config = {
+      data: data,
+      xkey: 'y',
+      ykeys: ['a', 'b'],
+      labels: ['Capital', 'Interest'],
+      fillOpacity: 0.4,
+      hideHover: 'auto',
+      stacked: true,
+      resize: true,
+      pointFillColors:['#ffffff'],
+      pointStrokeColors: ['black'],
+      barColors:['green','red'],
+      yLabelFormat:formatY,
+      xLabelFormat: formatX,
+  };
+    
+	config.element = 'stacked';
+	Morris.Bar(config);
+}
+//--------------------------------------------------------------------------------------------------------------------
 
 function resetForm(){
 	purchase_price = 0;
@@ -93,6 +187,7 @@ function resetForm(){
  	bond_amount= 0;
  	monthly_repayment = 0;
 	show = false;
+	yearlyPercentages = [];
 	location.reload();
 }
 
