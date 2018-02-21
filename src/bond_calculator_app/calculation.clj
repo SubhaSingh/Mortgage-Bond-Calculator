@@ -20,18 +20,11 @@
         monthly-repayment (:monthly_repayment params)
         fullname          (:fullname params)
         email             (:email params)]
-    (d/transact conn  [hash-map :db/id (d/tempid :calculations)
-              :user/user-fullname fullname
-              :user/email email
-              :calculation/purchase-price (Double/valueOf  purchase-price)
-              :calculation/deposit (Double/valueOf deposit)
-              :calculation/term (Double/valueOf term)
-              :calculation/interest-rate (Double/valueOf interest-rate)
-              :calculation/monthly-repayment  (Double/valueOf monthly-repayment)])))
-
-(let [db (d/db conn)]
-  (d/q '[:find ?e
-         :in $
-         :where
-         [?e :user/user-fullname "jane"]]
-       db))
+    (d/transact conn  [(hash-map :db/id (d/tempid :calculations)
+                                 :user/user-fullname fullname
+                                 :user/email email
+                                 :calculation/purchase-price (Double/valueOf  purchase-price)
+                                 :calculation/deposit (Double/valueOf deposit)
+                                 :calculation/term (Double/valueOf term)
+                                 :calculation/interest-rate (Double/valueOf interest-rate)
+                                 :calculation/monthly-repayment  (Double/valueOf monthly-repayment))])))
