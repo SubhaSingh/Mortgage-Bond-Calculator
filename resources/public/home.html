@@ -5,15 +5,17 @@
 	<title>Fixed Interest Rate Bond Calculator</title>
 	
 	<script src="https://www.w3schools.com/lib/w3.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 
+<!------------------------------------------------------------------------------------------------------------- -->
 
 <body onload="displaySaveForm()">
 
 <center>	
 <h1>Fixed Interest Rate Bond Calculator</h1>
 <br><br>
-
+<!------------------------------------------------------------------------------------------------------------- -->
 	<form action="javascript:void(0);" >
 	 Purchase Price:<br>
 	  <input type="number" name="purchase-price" id="purchase_price" min="0" required>
@@ -27,26 +29,28 @@
 	  Fixed Interest Rate:<br>
 	  <input type="number" name="interest-rate" id="interest_rate" min="0" required>
 	  <br><br>
-	  <input type="submit" value="Calculate" onclick="monthlyRepayment()">
+	  <input type="submit" name="calculateButton" value="Calculate" onclick="monthlyRepayment()"> 
+	  <input type="submit" name="resetButton" value="Reset" onclick="resetForm()">
 	</form> 
 	<br><br>
 
 	<p id="repaymentResult"></p>
 
-	  <form id ="save-form" action="javascript:void(0);" method=POST>
+<!------------------------------------------------------------------------------------------------------------- -->
+	<form id="saveForm" action="javascript:void(0);" method="POST">
 		Full Name:<br>
 	  <input type="text" name="fullname"  id="fullname" required>
 	  <br>
 	  Email:<br>
 	  <input type="email" name="email" id="email" pattern="^[\w]{1,}[\w.+-]{0,}@[\w-]{2,}([.][a-zA-Z]{2,}|[.][\w-]{2,}[.][a-zA-Z]{2,})$" required>
 	  <br><br>
-	  <input type="submit" value="Save Calculation" >
+	  <input type="submit" id="button" value="Save Calculation">
 
 	</form>
 
 </center>
 
-
+<!------------------------------------------------------------------------------------------------------------- -->
 
 <script>
 var purchase_price = 0;
@@ -81,13 +85,55 @@ function displayRepaymentResult(){
 	displaySaveForm();
 }
 
+function resetForm(){
+	purchase_price = 0;
+  	deposit = 0;
+	term = 0;
+ 	interest_rate = 0;
+ 	bond_amount= 0;
+ 	monthly_repayment = 0;
+	show = false;
+	location.reload();
+}
+
 function displaySaveForm(){
 	if(show){
-		document.getElementById("save-form").style.display = "block";
+		document.getElementById("saveForm").style.display = "block";
 	}else{
-		document.getElementById("save-form").style.display = "none";
+		document.getElementById("saveForm").style.display = "none";
 	}
 }
+
+//-------------------------------------------------------------------------------------------------------
+//JQuery
+function getFormData($form){
+var unindexed_array = $form.serializeArray();
+unindexed_array.push({name: 'purchase_price', value: purchase_price}, {name: 'deposit', value: deposit}, 
+    		{name: 'term', value: term}, {name: 'interest_rate', value: interest_rate}, {name: 'monthly_repayment', value: monthly_repayment});
+var indexed_array = {};
+
+$.map(unindexed_array, function(n, i){
+    indexed_array[n.name] = n.value;
+});
+
+return indexed_array;
+}
+
+$(document).ready(function (){
+	$("#button").click(function(){
+    var x = $("#saveForm");
+    console.log(x);
+    var form_data = getFormData(x);
+    $.ajax({
+         url: "/saveCalculation",
+         data: form_data,
+         type: "POST",
+         beforeSend: function(xhr){xhr.setRequestHeader('X-Test-Header', 'test-value');},
+         success: function(result) { alert('Save calculation request successful');
+     								location.reload();}
+      });
+	});
+});
 
 </script>
 

@@ -63,11 +63,11 @@
     :db/doc "The fixed interest rate"
     :db.install/_attribute :db.part/db}
 
-    {:db/id #db/id[:db.part/db]
-    :db/ident :calculation/interest-rate
+   {:db/id #db/id[:db.part/db]
+    :db/ident :calculation/monthly-repayment
     :db/valueType :db.type/double
     :db/cardinality :db.cardinality/one
-    :db/doc "The fixed interest rate"
+    :db/doc "The monthly repayment"
     :db.install/_attribute :db.part/db}])
 
 (d/transact conn schema)
@@ -89,6 +89,7 @@
                  :calculation/purchase-price 200000.0
                  :calculation/deposit 5000.0
                  :calculation/term 5.0
-                 :calculation/interest-rate 5.0}]
+                 :calculation/interest-rate 5.0
+                 :calculation/monthly-repayment 1200.0}]
   (println test-data)
   (d/transact conn [test-data]))

@@ -10,19 +10,17 @@
             [com.stuartsierra.component :as component]
             [taoensso.timbre :as timbre :refer [log  trace  debug  info  warn  error  fatal  report
               logf tracef debugf infof warnf errorf fatalf reportf
-              spy get-env]]))
+                                                spy get-env]]
+            [cheshire.core :refer :all]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;Handlers
 
 (defn save-calculation-handler [req]
-  (let [params (:params req)
-       ;; purchase-price (:params purchase-price)
-       ;; deposit (:params deposit)
-       ;; term (:params term)
-        ;; interest-rate (:params interest-rate)
-        ]
-    (println params)))
+  (let [params (:params  req)]
+    (do
+      (c/save-calculation params)
+      (redirect "home.html"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Routes
