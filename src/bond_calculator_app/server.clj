@@ -52,10 +52,3 @@
 
 (defn new-server [config]
   (->httpKitWebServer config))
-
-(comment
-
-  (def app (component/start (new-server {:port 6000 :thread 8})))
-
-  (component/stop app)
-  )
