@@ -35,7 +35,6 @@ Close browser and type following command in REPL
 
 	$(shutdown)
 
-FIXME
 
 ## License
 
