@@ -18,11 +18,11 @@
 
 (defn start []
   (let [start (component/start (init config))]
-        (timbre/info "Starting server on port: 5000")
+        (timbre/info "Starting http-kit server on port: 5000")
         (reset! system start)))
 
- (defn shutdown []
-    (timbre/info "Shutting down http-kit server on port: 5000" )
-    (component/stop @system)
-    (reset! system nil)
-    (timbre/info "App shutdown."))
+(defn shutdown []
+  (timbre/info "Shutting down http-kit server on port: 5000" )
+  (component/stop @system)
+  (reset! system nil)
+  (timbre/info "App shutdown."))

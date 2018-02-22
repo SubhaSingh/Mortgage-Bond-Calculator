@@ -2,7 +2,7 @@
   (:require [datomic.api :as d]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
+;;;Database
 (def  uri "datomic:free://localhost:4334/bondCalculations")
 
 (def conn (d/connect uri))

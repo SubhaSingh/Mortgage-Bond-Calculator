@@ -70,26 +70,16 @@
     :db/doc "The monthly repayment"
     :db.install/_attribute :db.part/db}])
 
-(d/transact conn schema)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; ADD Calculations Partition
-(def add-calculations-partition
+
+(comment
+
+  (def add-calculations-partition
   [{:db/id #db/id[:db.part/db -1]
     :db/ident :calculations}
    [:db/add :db.part/db :db.install/partition #db/id[:db.part/db -1]]])
 
-(d/transact conn add-calculations-partition)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Testing
-(let [test-data {:db/id (d/tempid :calculations)
-                 :user/user-fullname "John Doe"
-                 :user/email "john@doe.com"
-                 :calculation/purchase-price 200000.0
-                 :calculation/deposit 5000.0
-                 :calculation/term 5.0
-                 :calculation/interest-rate 5.0
-                 :calculation/monthly-repayment 1200.0}]
-  (println test-data)
-  (d/transact conn [test-data]))
+  )

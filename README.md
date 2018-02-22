@@ -7,7 +7,7 @@ Fixed Mortgage Bond Calculator Web App
 * Linux (Developed with Linux Mint 18 Cinnamon 64-bit)
 * Oracle Java 8
 * Leiningen (v2.7 or later)
-* Datomic Free v0.9.5407 or later
+* Datomic Free v0.9.5656 or later
 
 ## Usage
 
